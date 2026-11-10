@@ -1,0 +1,18 @@
+node_modules
+.next
+out
+build
+coverage
+next-env.d.ts
+tsconfig.tsbuildinfo
+*.log
+.env*.local
+
+# Служебное состояние opencode: цель и её чекпоинты живут в папке проекта
+.opencode/
+
+# Кадры прогонов и выгрузки IDE
+.cache/
+
+# Настройки редактора: у каждого свои
+.idea/

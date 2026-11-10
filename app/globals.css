@@ -1,0 +1,722 @@
+@import "tailwindcss";
+
+/* Тёмная тема через класс на <html>, как в next-themes (attribute="class") */
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  /* Текст и иконки на светлом фоне: сам акцент #00a5ef даёт 2.6:1 и не проходит AA. */
+  --color-primary-text: var(--primary-text);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-border: var(--border);
+  --color-ring: var(--ring);
+  --color-success: var(--success);
+  --color-warm: var(--warm);
+  --color-destructive: var(--destructive);
+  --color-gradient-primary: var(--gradient-primary);
+  --color-gradient-secondary: var(--gradient-secondary);
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --shadow-badge: var(--shadow-badge);
+
+  --animate-blink-cursor: blink-cursor 1s steps(2, start) infinite;
+  --animate-marquee: marquee var(--duration, 40s) infinite linear;
+  --animate-marquee-vertical: marquee-vertical var(--duration, 40s) infinite linear;
+
+  /* лента сдвигается на свою ширину + зазор: без этого на стыке копий «дёргается» */
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(calc(-100% - var(--gap, 1rem)));
+    }
+  }
+
+  @keyframes marquee-vertical {
+    from {
+      transform: translateY(0);
+    }
+    to {
+      transform: translateY(calc(-100% - var(--gap, 1rem)));
+    }
+  }
+
+  @keyframes blink-cursor {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0;
+    }
+  }
+}
+
+/* Токены объявлены один раз через light-dark(): конкретное значение выбирает
+   свойство color-scheme, унаследованное от <html>. Так один и тот же набор
+   переменных обслуживает и системную тему (color-scheme: light dark),
+   и явный выбор пользователя (.light / .dark из cookie). */
+:root {
+  color-scheme: light dark;
+  /* Маркер сборки стилей: если в браузере он старее, чем в репозитории,
+     значит вкладка держит устаревший CSS (проверка в консоли:
+     getComputedStyle(document.documentElement).getPropertyValue("--css-build")) */
+  --css-build: "2026-10-23T19:30Z";
+  --radius: 0.625rem;
+  --background: light-dark(#f9fafb, #09090b);
+  --foreground: light-dark(#0a0a0a, #fafafa);
+  --card: light-dark(#ffffff, #171717);
+  --card-foreground: light-dark(#0a0a0a, #fafafa);
+  --primary: light-dark(#00a5ef, #00a5ef);
+  /* Тёмные чернила на акценте: белый на #00a5ef даёт 2.9:1 и не проходит AA,
+     тёмный — 8.9:1. Акцент остаётся громким, текст остаётся читаемым. */
+  --primary-foreground: light-dark(#04121a, #04121a);
+  /* Затемнённый акцент для ссылок и мелких подписей: 4.8:1 на white и на bg-primary/10. */
+  --primary-text: light-dark(#0069a8, #00a5ef);
+  --secondary: light-dark(#f5f5f5, #262626);
+  --secondary-foreground: light-dark(#171717, #fafafa);
+  --muted: light-dark(#f5f5f5, #262626);
+  /* #6b6b6b, а не #737373: на bg-muted заголовки таблиц давали 4.34:1. */
+  --muted-foreground: light-dark(#6b6b6b, #a1a1a1);
+  --accent: light-dark(#f5f5f5, #262626);
+  --accent-foreground: light-dark(#171717, #fafafa);
+  --border: light-dark(#e5e5e5, rgb(255 255 255 / 0.1));
+  --ring: light-dark(#a1a1a1, #737373);
+  /* Второй акцент: только сигналы состояния — «на подъёме» и ненулевая цена.
+     Не участвует в фонах и градиентах: иначе два акцента спорят. */
+  /* #c2410c — 5:1 на светлом фоне; #ea580c давал 3.4:1 для 10px-меток JS. */
+  --warm: light-dark(#c2410c, #fb923c);
+  --success: light-dark(#2f9f3d, #37c667);
+  --destructive: light-dark(#e40014, #ff6568);
+
+  --gradient-primary: #2cd5ff;
+  --gradient-secondary: #2c30ff;
+
+  /* цвет внутри тени тоже красится light-dark() — сама тень остаётся одной строкой */
+  --shadow-badge:
+    0 0 0 1px light-dark(rgb(0 0 0 / 0.08), rgb(255 255 255 / 0.08)),
+    0 1px 2px -0.5px light-dark(rgb(0 0 0 / 0.12), rgb(0 0 0 / 0.5)),
+    0 2px 4px -2px light-dark(rgb(0 0 0 / 0.1), rgb(0 0 0 / 0.4));
+}
+
+/* Явный выбор (cookie) перебивает системную тему — и для токенов, и для
+   color-scheme (скроллбары, формы, встроенные контролы) */
+.light {
+  color-scheme: light;
+}
+
+.dark {
+  color-scheme: dark;
+}
+
+/* Иконки тумблера переключаются чистым CSS: их состояние — это и есть color-scheme.
+   Поэтому кнопка не зависит от гидрации и не мигает на первом кадре. */
+.theme-sun {
+  transition:
+    opacity 0.2s,
+    transform 0.2s;
+}
+
+.theme-moon {
+  position: absolute;
+  opacity: 0;
+  transform: rotate(90deg) scale(0.9);
+  transition:
+    opacity 0.2s,
+    transform 0.2s;
+}
+
+:root.dark .theme-sun {
+  opacity: 0;
+  transform: rotate(-90deg) scale(0.9);
+}
+
+:root.dark .theme-moon {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) .theme-sun {
+    opacity: 0;
+    transform: rotate(-90deg) scale(0.9);
+  }
+
+  :root:not(.light) .theme-moon {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Ленты и мерцание — декоративные: при системном «уменьшить движение» встаём на паузу.
+   Dither-канвас гасит свой rAF сам (см. components/dither/dither.tsx). */
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee,
+  .animate-marquee-vertical {
+    animation-play-state: paused !important;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "ss01";
+  }
+
+  /* Preflight задаёт code/pre системный monospace. В справочнике это давало
+     Consolas рядом с Geist Mono — тянем код в ту же гарнитуру, что и `font-mono`. */
+  code,
+  kbd,
+  samp,
+  pre {
+    font-family: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
+  }
+}
+
+/* «Пиксельная» полоса: контейнер всегда растянут, canvas внутри абсолютный */
+.dither-strip {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.dither-strip canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
+}
+
+/* ---------- кит: декоративные слои ----------
+   Всё, что ниже, — CSS без JS: рамка-блик, прожектор под курсором, блик при
+   наведении и ячейки живой сетки. Анимации только на opacity/transform и
+   замирают при prefers-reduced-motion (блок в конце файла). */
+
+@property --beam-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes kit-beam-spin {
+  to {
+    --beam-angle: 360deg;
+  }
+}
+
+@keyframes kit-shine {
+  0% {
+    background-position: 200% center;
+  }
+  100% {
+    background-position: -100% center;
+  }
+}
+
+@keyframes kit-highlight {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.kit-shiny {
+  background-image: linear-gradient(
+    100deg,
+    var(--shine-color, currentColor) 30%,
+    var(--shine-highlight, white) 48%,
+    var(--shine-color, currentColor) 66%
+  );
+  background-size: 220% 100%;
+  animation: kit-shine var(--shine-duration, 4s) linear infinite;
+}
+
+.kit-gradient-animated {
+  animation: kit-shine 7s linear infinite;
+}
+
+.kit-highlight > span[aria-hidden] {
+  transform-origin: left center;
+  animation: kit-highlight 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes kit-grid-cell {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  12%,
+  32% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 0.08;
+  }
+}
+
+/* Блик по периметру: conic-gradient обрезан по content-box, поэтому линия
+   толщиной 1px рисуется фоном и не участвует в layout. */
+.kit-beam::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(
+    from var(--beam-angle),
+    transparent 0deg 300deg,
+    var(--beam-from, var(--gradient-primary)) 344deg,
+    var(--beam-to, var(--gradient-secondary)) 360deg
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  animation: kit-beam-spin var(--beam-duration, 8s) linear infinite;
+  pointer-events: none;
+}
+
+/* Режим shine: та же рамка, но статичный градиент — «дорогая» обводка */
+.kit-beam-static::before {
+  animation: none;
+  background: linear-gradient(135deg, var(--beam-from), var(--beam-to));
+  opacity: 0.85;
+}
+
+/* Орбита: внешний слой крутится по часовой, внутренний — против,
+   поэтому иконка едет по окружности и остаётся ровной. */
+@keyframes kit-orbit {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes kit-orbit-reverse {
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+.kit-orbit,
+.kit-orbit-reverse {
+  animation-duration: var(--orbit-duration, 20s);
+  animation-delay: var(--orbit-delay, 0s);
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.kit-orbit {
+  animation-name: kit-orbit;
+}
+
+.kit-orbit-reverse {
+  animation-name: kit-orbit-reverse;
+}
+
+/* Прожектор: пятно следует за --mx/--my, которые пишет сам компонент */
+/* Кольцо рамки: тот же градиент, обрезанный по маске до 1 px по краю.
+   Отдельный слой нужен потому, что border нельзя покрасить градиентом. */
+.kit-magic::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  /* Радиус кольца в процентах от карточки, а не в пикселях: карточка в
+     каталоге узкая, и фиксированные 200 px не доставали до её края — рамка
+     не загоралась вовсе. Проценты масштабируются вместе с карточкой. */
+  background: radial-gradient(
+    var(--kit-ring, 110% 110%) at var(--mx, 50%) var(--my, 0%),
+    var(--kit-spot, var(--gradient-primary)),
+    transparent 62%
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.25s ease-out;
+  pointer-events: none;
+}
+
+.kit-magic:hover::before,
+.kit-magic:focus-within::before {
+  opacity: 0.85;
+}
+
+.kit-magic-always::before {
+  opacity: 0.85;
+}
+
+.kit-magic::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    var(--kit-radius, 240px) circle at var(--mx, 50%) var(--my, 0%),
+    var(--kit-spot, var(--gradient-primary)),
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity 0.2s ease-out;
+  pointer-events: none;
+}
+
+.kit-magic:hover::after,
+.kit-magic:focus-within::after {
+  opacity: 0.18;
+}
+
+/* Пятно без курсора: та же яркость, что на hover, поэтому плитка каталога
+   показывает ровно тот эффект, который обещает подпись. */
+.kit-magic-always::after {
+  opacity: 0.18;
+}
+
+/* Блик при наведении: градиентная полоса проезжает слева направо */
+.kit-glare::after {
+  content: "";
+  position: absolute;
+  inset: -40% -10%;
+  background: linear-gradient(
+    var(--glare-angle, 120deg),
+    transparent 42%,
+    light-dark(rgb(255 255 255 / 0.75), rgb(255 255 255 / 0.28)) 50%,
+    transparent 58%
+  );
+  transform: translateX(-120%);
+  opacity: 0;
+  transition: opacity 0.15s ease-out;
+  pointer-events: none;
+}
+
+.kit-glare:hover::after {
+  opacity: 1;
+  transform: translateX(120%);
+  transition:
+    transform var(--glare-duration, 700ms) ease-out,
+    opacity 0.15s ease-out;
+}
+
+@media (hover: none) {
+  .kit-magic:hover::before {
+    opacity: 0;
+  }
+
+  .kit-glare:hover::after {
+    opacity: 0;
+  }
+}
+
+/* Авто-проход: блик едет сам, наведение только ускоряет. Ровно то же движение,
+   что у hover, поэтому плитка в каталоге не врёт про характер эффекта. */
+.kit-glare-auto::after {
+  opacity: 1;
+  animation: kit-glare-sweep var(--glare-sweep, 4.5s) ease-in-out infinite;
+}
+
+.kit-glare-auto:hover::after {
+  animation-duration: var(--glare-duration, 700ms);
+}
+
+@keyframes kit-glare-sweep {
+  0% {
+    transform: translateX(-120%);
+  }
+  35%,
+  100% {
+    transform: translateX(120%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kit-glare-auto::after {
+    animation: none;
+    opacity: 0;
+  }
+}
+
+/* Ячейка живой сетки: задержка отрицательная, поэтому сетка «уже идёт» */
+.kit-grid-cell {
+  animation: kit-grid-cell var(--kit-duration, 6s) ease-in-out infinite;
+  border-radius: 2px;
+}
+
+/* Якоря: заголовок секции не должен уезжать под липкую шапку при переходе по меню. */
+section[id] {
+  scroll-margin-top: 5.5rem;
+}
+
+@layer utilities {
+  /* Мягкие края ленты: контент «выцветает», а не обрезается */
+  .mask-x {
+    mask-image: linear-gradient(to right, transparent, black 14%, black 86%, transparent);
+  }
+
+  .mask-y {
+    mask-image: linear-gradient(to bottom, transparent, black 8%, black 92%, transparent);
+  }
+}
+
+/* Кит: при системном «уменьшить движение» декоративные слои замирают.
+   Блок стоит последним в файле — иначе базовые правила ниже по каскаду
+   перебили бы animation: none. */
+@media (prefers-reduced-motion: reduce) {
+  .kit-shiny {
+    animation: none;
+    background-image: none;
+    -webkit-text-fill-color: currentColor;
+  }
+
+  .kit-gradient-animated {
+    animation: kit-shine 7s linear infinite;
+  }
+
+  .kit-highlight > span[aria-hidden] {
+    animation: none;
+    transform: none;
+  }
+
+  .kit-beam::before {
+    animation: none;
+    opacity: 0.5;
+  }
+
+  .kit-grid-cell {
+    animation: none;
+    opacity: 0.18;
+  }
+
+  .kit-glare:hover::after {
+    transform: translateX(-120%);
+    transition: none;
+  }
+
+  .kit-magic::after {
+    transition: none;
+  }
+
+  .kit-orbit,
+  .kit-orbit-reverse {
+    animation: none;
+  }
+}
+
+/* Паттерны: сияние дрейфует только через transform, иначе каждый кадр красит пиксели. */
+.pattern-aurora-blob {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(34px);
+  will-change: transform;
+}
+
+.pattern-aurora-blob-a {
+  top: -18%;
+  left: 8%;
+  width: 46%;
+  height: 62%;
+  background: radial-gradient(circle, rgb(44 213 255 / 0.5), transparent 68%);
+  animation: pattern-drift-a 26s ease-in-out infinite;
+}
+
+.pattern-aurora-blob-b {
+  right: 4%;
+  bottom: -22%;
+  width: 52%;
+  height: 70%;
+  background: radial-gradient(circle, rgb(44 48 255 / 0.55), transparent 70%);
+  animation: pattern-drift-b 34s ease-in-out infinite;
+}
+
+@keyframes pattern-drift-a {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(14%, 10%, 0) scale(1.12);
+  }
+}
+
+@keyframes pattern-drift-b {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1.05);
+  }
+  50% {
+    transform: translate3d(-12%, -8%, 0) scale(0.95);
+  }
+}
+
+/* Сравнение фоном: «медиа» обозначено движущейся полосой, без единого файла. */
+.pattern-video {
+  background: linear-gradient(115deg, #16202c 0%, #2b3f52 38%, #16202c 62%, #223141 100%);
+  background-size: 220% 220%;
+  animation: pattern-video-shift 8s linear infinite;
+}
+
+@keyframes pattern-video-shift {
+  0% {
+    background-position: 0 50%;
+  }
+  100% {
+    background-position: 100% 50%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pattern-aurora-blob-a,
+  .pattern-aurora-blob-b,
+  .pattern-video {
+    animation: none;
+  }
+}
+
+/* Кино на прокрутке: сцена со своей прокруткой, анимация привязана к ней.
+   Где scroll-timeline нет, блок остаётся статичным: @supports не даёт ему сломаться. */
+.scrolly-scene {
+  scrollbar-width: none;
+  overscroll-behavior: contain;
+}
+
+.scrolly-scene::-webkit-scrollbar {
+  display: none;
+}
+
+@supports (animation-timeline: view()) {
+  .scrolly-title {
+    animation: scrolly-title linear both;
+    animation-timeline: view();
+    animation-range: entry 2% cover 60%;
+  }
+
+  .scrolly-frame {
+    animation: scrolly-frame linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 92%;
+  }
+
+  .scrolly-progress {
+    animation: scrolly-progress linear both;
+    animation-timeline: scroll(nearest block);
+  }
+}
+
+@keyframes scrolly-title {
+  from {
+    opacity: 0.2;
+    transform: translateY(16px) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes scrolly-frame {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes scrolly-progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scrolly-title,
+  .scrolly-frame,
+  .scrolly-progress {
+    animation: none;
+  }
+}
+
+/* Песочница «четыре линии, четыре слоя»: изоляция слоя гасит остальные.
+   Правило приёма — слой, который нельзя выключить, не слой; здесь это буквально. */
+.four-layer {
+  transition:
+    opacity 300ms ease,
+    outline-color 300ms ease;
+}
+
+.four-layers-stage[data-focus="1"] .four-layer:not([data-layer="1"]),
+.four-layers-stage[data-focus="2"] .four-layer:not([data-layer="2"]),
+.four-layers-stage[data-focus="3"] .four-layer:not([data-layer="3"]),
+.four-layers-stage[data-focus="4"] .four-layer:not([data-layer="4"]) {
+  opacity: 0.1;
+}
+
+.four-layers-stage[data-focus="1"] .four-layer[data-layer="1"],
+.four-layers-stage[data-focus="2"] .four-layer[data-layer="2"],
+.four-layers-stage[data-focus="3"] .four-layer[data-layer="3"],
+.four-layers-stage[data-focus="4"] .four-layer[data-layer="4"] {
+  outline: 1px dashed rgb(44 213 255 / 0.55);
+  outline-offset: -6px;
+}
+
+/* Нео-брутализм: нажатие «вдавливает» блок — тень снимается, сдвиг равен её величине. */
+.pattern-brutal {
+  transition:
+    transform 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.pattern-brutal:hover {
+  transform: translate(3px, 3px);
+  box-shadow: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pattern-brutal {
+    transition: none;
+  }
+}

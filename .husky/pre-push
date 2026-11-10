@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Гейты перед пушем: линт, типы, доки
+npm run lint
+npm run typecheck
+npm run check:docs
+npm run verify:vendor

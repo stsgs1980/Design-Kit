@@ -1,0 +1,15 @@
+node_modules/
+.next/
+out/
+build/
+coverage/
+package-lock.json
+tsconfig.tsbuildinfo
+prototypes/
+
+# Вендорные скилы агентов: приезжают в своём форматировании
+.claude/
+.cache/
+
+# Состояние локального агента: не наш код
+.opencode/

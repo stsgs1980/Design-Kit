@@ -1,0 +1,66 @@
+name: CI
+
+on: [push, pull_request]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  HUSKY: 0
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run verify:code
+      - run: npm run verify:kit
+      - run: npm run verify:patterns
+      - run: npm run verify:props
+      - run: npm run check:docs
+      - run: npm run lint:md
+      - run: npm run format:check
+
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+
+  effects:
+    # Браузерный приёмочный прогон: консоль, темы, адаптив, reduced-motion, чипы кита.
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build
+      - name: Проверка эффектов на прод-сборке
+        run: |
+          npm start &
+          for i in $(seq 1 60); do
+            curl -sf http://127.0.0.1:3000 > /dev/null && break
+            sleep 2
+          done
+          npm run verify:effects
